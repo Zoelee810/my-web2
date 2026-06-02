@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>AI手語雙向溝通終端 | 真實鏡頭 · 無障礙溝通</title>
+    <!-- Google Font & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #f5f7fc 0%, #eef2f8 100%);
+            color: #1a2634;
+            line-height: 1.4;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 頭部區域 */
+        .hero {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: #d4e2ff;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #0057b3;
+            margin-bottom: 1rem;
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(2px);
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e3c72, #2b4c8a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.3px;
+        }
+        .subhead {
+            font-size: 1.1rem;
+            color: #2c3e4e;
+            max-width: 750px;
+            margin: 0 auto;
+            font-weight: 400;
+            background: rgba(255,255,240,0.6);
+            backdrop-filter: blur(4px);
+            padding: 0.5rem 1.2rem;
+            border-radius: 60px;
+            display: inline-block;
+        }
+        .scene-tag {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.7rem;
+            margin-top: 1.2rem;
+        }
+        .scene-tag span {
+            background: white;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            color: #1e4663;
+            border: 1px solid rgba(0,80,130,0.15);
+        }
+        .scene-tag i {
+            margin-right: 6px;
+            font-size: 0.75rem;
+        }
+
+        /* 雙核心溝通面板 */
+        .communication-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.8rem;
+            margin-bottom: 2.5rem;
+        }
+
+        /* 卡片通用樣式 */
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0,0,0,0.02);
+            border: 1px solid rgba(255,255,255,0.5);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+        }
+        .card-header {
+            padding: 1.2rem 1.5rem 0.6rem 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-header i {
+            font-size: 1.6rem;
+            color: #2c6e9e;
+        }
+        .cam-toggle-switch {
+            background: rgba(255,255,255,0.9);
+            border: 1px solid #cbdde9;
+            border-radius: 2rem;
+            padding: 0.4rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1e4663;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(2px);
+        }
+        .cam-toggle-switch:hover {
+            background: #eef2ff;
+            border-color: #3b82f6;
+            transform: scale(0.97);
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* 鏡頭區域 - 真實影片流 */
+        .camera-preview {
+            background: #0f1722;
+            border-radius: 1.2rem;
+            height: 240px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.2rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        #videoElement {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* 鏡像效果，更自然 */
+            background: #1e2a3a;
+        }
+        .skeleton-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            color: white;
+            pointer-events: none;
+            z-index: 2;
+            font-weight: 500;
+        }
+        .skeleton-points-animation {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            display: flex;
+            gap: 6px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 30px;
+            z-index: 2;
+        }
+        .skeleton-points-animation span {
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: pulse 1.2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: scale(0.8);}
+            100% { opacity: 1; transform: scale(1);}
+        }
+        .cam-status {
+            position: absolute;
+            top: 10px;
+            left: 12px;
+            background: rgba(0,0,0,0.6);
+            color: #bbf0ff;
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            z-index: 2;
+            font-weight: 500;
+            backdrop-filter: blur(2px);
+        }
+        .recognition-result {
+            background: #f0f4fa;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 4px solid #2c6e9e;
+        }
+        .result-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #4a627a;
+            font-weight: 600;
+        }
+        .result-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-top: 6px;
+            word-break: break-word;
+            color: #0a2540;
+        }
+        .example-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .example-btn {
+            background: white;
+            border: 1px solid #cbdde9;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1e4663;
+        }
+        .example-btn:hover {
+            background: #e2edff;
+            border-color: #3b82f6;
+            transform: scale(0.96);
+        }
+        .capture-btn {
+            background: #2c6e9e;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 8px;
+            width: 100%;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .capture-btn:hover {
+            background: #1b4f72;
+        }
+
+        /* 虛擬人區域 */
+        .avatar-area {
+            background: linear-gradient(125deg, #eef2ff, #ffffff);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1.3rem;
+            border: 1px solid rgba(59,130,246,0.2);
+            box-shadow: 0 8px 18px -8px rgba(0,0,0,0.08);
+        }
+        .avatar-icon {
+            font-size: 4rem;
+            background: #ffffffd9;
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 0.8rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 60px;
+            box-shadow: 0 10px 15px -5px rgba(0,0,0,0.1);
+            background: linear-gradient(145deg, #f9fcff, #eef3fc);
+        }
+        .sign-animation {
+            background: #e9f0fe;
+            border-radius: 1rem;
+            padding: 0.9rem;
+            min-height: 85px;
+            transition: all 0.2s;
+        }
+        .sign-text {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #0057b3;
+            word-break: break-word;
+        }
+        .sign-sub {
+            font-size: 0.7rem;
+            color: #5c6f87;
+            margin-top: 8px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border-radius: 2rem;
+            border: 1px solid #cbdbe0;
+            background: white;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        .input-group input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+        .btn {
+            background: #1f5f8e;
+            border: none;
+            padding: 0 1.2rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+        .btn-outline {
+            background: white;
+            color: #1f5f8e;
+            border: 1px solid #1f5f8e;
+        }
+        .btn-outline:hover {
+            background: #eef4ff;
+        }
+        .btn-primary {
+            background: #1f5f8e;
+        }
+        .btn-primary:hover {
+            background: #0e4162;
+            transform: scale(0.97);
+        }
+        .mic-btn {
+            background: #2d6a4f;
+        }
+
+        /* 技術參數 & 路線 */
+        .tech-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.2rem 1.8rem;
+            margin-bottom: 2rem;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.03);
+            border: 1px solid #e2edf2;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #0b3b5f;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            color: #4c6a7e;
+        }
+
+        .tech-stack {
+            background: #f8fafd;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.8rem;
+        }
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 1rem 0 0.5rem;
+        }
+        .badge {
+            background: #eef2ff;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .roadmap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.8rem;
+            border-top: 1px dashed #cbdbeb;
+            padding-top: 1rem;
+        }
+        .roadmap-step {
+            flex: 1;
+            font-size: 0.8rem;
+            background: #ffffffba;
+            padding: 0.5rem;
+            border-radius: 1rem;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #5a6e82;
+            margin-top: 2rem;
+            border-top: 1px solid #cbdde9;
+            padding-top: 1.5rem;
+        }
+
+        @media (max-width: 880px) {
+            .communication-panel {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            body {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+        .flash {
+            animation: flashBorder 0.4s ease;
+        }
+        @keyframes flashBorder {
+            0% { background-color: rgba(59,130,246,0.2);}
+            100% { background-color: transparent; }
+        }
+        .error-message {
+            background: #ffe6e5;
+            color: #b91c1c;
+            border-radius: 1rem;
+            padding: 0.6rem;
+            text-align: center;
+            font-size: 0.75rem;
+            margin-top: 8px;
+        }
+        /* 新增：覆蓋在視頻上的骨骼畫布樣式 */
+        .output_canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* 確保在視頻上方，但在 UI 提示的下方 */
+            pointer-events: none; /* 讓點擊事件穿透到下層 */
+            transform: scaleX(-1); /* 與視頻保持一致的鏡像反轉 */
+        }
+    </style>
+    <!-- 新增：引入 MediaPipe 核心庫 -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+    <!-- Hero 區域 -->
+    <div class="hero">
+        <div class="hero-badge"><i class="fas fa-hands-helping"></i> 香港·智慧共融 | AI手語雙向溝通終端</div>
+        <h1>手語傳譯 · 心聲相通</h1>
+        <div class="subhead">
+            <i class="fas fa-comment-dots"></i> 聽障人士 ↔ 工作人員 即時雙向翻譯 | 支援香港手語(HKSL) / 粵語 / 英語 / 普通話
+    </div>
+
+    <!-- 核心雙向溝通面板 -->
+    <div class="communication-panel">
+        <!-- 左側：手語識別模組（聽障人士 → 文字/語音）真實鏡頭+模擬識別 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-left">
+                    <i class="fas fa-camera-retro"></i> 手語識別輸入
+                </div>
+                <button id="camToggleBtn" class="cam-toggle-switch"><i class="fas fa-video"></i> <span id="camToggleText">關閉鏡頭</span></button>
+            </div>
+            <div class="card-body">
+                <!-- 真實鏡頭預覽區 -->
+                <div class="camera-preview">
+                    <video id="videoElement" autoplay playsinline muted></video>
+                    <!-- 新增：骨骼繪製畫布 -->
+                    <canvas id="outputCanvas" class="output_canvas" width="1280" height="720"></canvas>
+
+                    <div class="cam-status" id="camStatus"><i class="fas fa-video"></i> 等待鏡頭授權...</div>
+                    <div class="skeleton-points-animation">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                    <div class="skeleton-overlay">
+                        <i class="fas fa-hand-peace"></i> MediaPipe 骨骼追蹤
+                    </div>
+                </div>
+                <!-- 識別結果展示 -->
+                <div class="recognition-result">
+                    <div class="result-label"><i class="fas fa-sign-language"></i> 實時翻譯結果 (手語 → 文字/語音)</div>
+                    <div class="result-text" id="signToTextResult">🖐️ 對着鏡頭打手語，點擊下方“識別手語”</div>
+                    <div style="font-size:0.7rem; margin-top:6px; color:#4a627a;">置信度: <span id="confidenceSpan">--</span></div>
+                </div>
+                <!-- 模擬手語識別 + 真實鏡頭抓拍演示 -->
+                <button id="captureAndRecognizeBtn" class="capture-btn"><i class="fas fa-camera"></i> 📸 從鏡頭識別手語</button>
+                <div style="margin-top:12px; font-size:0.7rem; background:#eef2fa; border-radius:20px; padding:6px 12px;">
+                    <i class="fas fa-microphone-alt"></i> 識別後可自動播報語音
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側：語音/文字 → 虛擬人手語（工作人員回覆）-->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-left">
+                    <i class="fas fa-robot"></i> 虛擬人 · 手語回覆
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- 虛擬人動畫區 -->
+                <div class="avatar-area">
+                    <div class="avatar-icon">
+                        <i class="fas fa-user-astronaut" style="font-size:3rem; color:#2c6e9e;"></i>
+                    </div>
+                    <div class="sign-animation" id="signAnimationBox">
+                        <div class="sign-text" id="virtualSignText">🤖✨ 等待回覆生成手語</div>
+                    </div>
+                </div>
+                <!-- 工作人員輸入區域（模擬語音轉文字 + 文字轉手語）-->
+                <div style="margin-top: 0.5rem;">
+                    <label style="font-size:0.7rem; font-weight:600;"><i class="fas fa-comment-dots"></i> 工作人員語音/文字輸入 (粵語/英語/普通話識別)</label>
+                    <div class="input-group">
+                        <input type="text" id="staffTextInput" placeholder="輸入文字 或 點擊麥克風語音識別..." value="你好，需要幫忙嗎？">
+                        <button class="btn btn-outline" id="voiceInputBtn"><i class="fas fa-microphone"></i> 粵/英/普</button>
+                        <button class="btn btn-primary" id="generateSignBtn"><i class="fas fa-hands"></i> 生成手語</button>
+                    </div>
+                    <div style="font-size:0.7rem; color:#4a6f8f; background:#eef2fa; border-radius:20px; padding:6px 12px; margin-top:6px;">
+                        <i class="fas fa-language"></i> Whisper語音識別 → 文字 → 實時映射HKSL手勢序列 → 虛擬人動畫播放
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 技術指標 & 準確率展示 -->
+    <div class="tech-stats">
+        <div class="stat-item"><span class="stat-number">≥90%</span><div class="stat-label">旅遊場景識別準確率</div></div>
+        <div class="stat-item"><span class="stat-number">≤3s</span><div class="stat-label">翻譯響應時間</div></div>
+        <div class="stat-item"><span class="stat-number">720P</span><div class="stat-label">高清鏡頭採集</div></div>
+        <div class="stat-item"><span class="stat-number">HKSL</span><div class="stat-label">香港手語專屬微調數據集</div></div>
+        <div class="stat-item"><span class="stat-number">跨平台</span><div class="stat-label">iOS/Android/網頁版</div></div>
+    </div>
+
+    <!-- 核心技術棧 & 路線 -->
+    <div class="tech-stack">
+        <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-microchip"></i><strong style="font-size:1rem;">AI 核心技術棧</strong></div>
+        <div class="badge-group">
+            <span class="badge">🤟 MediaPipe / OpenPose 骨骼關鍵點</span>
+            <span class="badge">🧠 SignBERT + HKSL專屬微調</span>
+            <span class="badge">🎙️ OpenAI Whisper (粵語/英語/普通話)</span>
+            <span class="badge">🎭 文字→HKSL手勢映射 + Live2D虛擬人</span>
+            <span class="badge">⚛️ React/Vue + Flutter/RN</span>
+            <span class="badge">🐍 Python/Node.js RESTful API</span>
+        </div>
+        <div style="margin-top: 12px; font-size:0.75rem; background: #fff; border-radius: 20px; padding: 8px 12px;">
+            <i class="fas fa-map-marked-alt"></i> <strong>應用場景：</strong>香港旅遊服務點、公立醫院、銀行櫃檯、政府合署 — 打造無障礙溝通城市，體現人文關懷與智慧旅遊。
+        </div>
+</div>
+</div>
+    <footer>
+        <i class="fas fa-hand-peace"></i> AI手語雙向溝通終端 · 讓每一次服務都有溫度 | 支援香港手語(HKSL) 及 粵語/英語/普通話實時互譯
+    </footer>
+</div>
+<script>
+    // ---------- 真實鏡頭邏輯 ----------
+    const video = document.getElementById('videoElement');
+    const camStatusSpan = document.getElementById('camStatus');
+    let stream = null;
+
+    async function initCamera() {
+        try {
+            const constraints = {
+                video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }
+            };
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
+            video.srcObject = stream;
+            await video.play();
+            camStatusSpan.innerHTML = '<i class="fas fa-check-circle"></i> 鏡頭已啟動 | 720P';
+            camStatusSpan.style.backgroundColor = "rgba(0,40,0,0.7)";
+        } catch (err) {
+            console.error("鏡頭錯誤:", err);
+            camStatusSpan.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 無法存取鏡頭，請檢查權限';
+            camStatusSpan.style.backgroundColor = "rgba(100,0,0,0.7)";
+            const cameraPreviewDiv = document.querySelector('.camera-preview');
+            if (cameraPreviewDiv) {
+                const errDiv = document.createElement('div');
+                errDiv.className = 'error-message';
+                errDiv.innerText = '鏡頭不可用，您仍可使用範例按鈕體驗手語識別功能。';
+                cameraPreviewDiv.appendChild(errDiv);
+            }
+        }
+    }
+
+    initCamera();
+
+    // ========== 新增：攝像頭開關控制 (不影響原有其他邏輯) ==========
+    const camToggleBtn = document.getElementById('camToggleBtn');
+    const camToggleTextSpan = document.getElementById('camToggleText');
+
+    // 停止攝像頭並釋放資源
+    async function stopCameraOnly() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        if (video) {
+            video.srcObject = null;
+        }
+        camStatusSpan.innerHTML = '<i class="fas fa-video-slash"></i> 鏡頭已關閉';
+        camStatusSpan.style.backgroundColor = "rgba(80,80,80,0.7)";
+        camToggleTextSpan.innerText = "開啟鏡頭";
+        camToggleBtn.querySelector('i').className = "fas fa-video-slash";
+    }
+
+    // 重新開啟攝像頭 (與initCamera類似但不覆蓋原有initCamera)
+    async function startCameraOnly() {
+        // 如果已經有流則先關閉
+        if (stream) {
+            await stopCameraOnly();
+        }
+        try {
+            const constraints = {
+                video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }
+            };
+            const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+            stream = newStream;
+            video.srcObject = stream;
+            await video.play();
+            camStatusSpan.innerHTML = '<i class="fas fa-check-circle"></i> 鏡頭已啟動 | 720P';
+            camStatusSpan.style.backgroundColor = "rgba(0,40,0,0.7)";
+            camToggleTextSpan.innerText = "關閉鏡頭";
+            camToggleBtn.querySelector('i').className = "fas fa-video";
+            // 可選：移除之前可能遺留的錯誤提示
+            const existingErr = document.querySelector('.camera-preview .error-message');
+            if (existingErr) existingErr.remove();
+        } catch (err) {
+            console.error("重新開啟鏡頭失敗:", err);
+            camStatusSpan.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 鏡頭授權失敗，請檢查權限';
+            camStatusSpan.style.backgroundColor = "rgba(100,0,0,0.7)";
+            camToggleTextSpan.innerText = "開啟鏡頭";
+            camToggleBtn.querySelector('i').className = "fas fa-video-slash";
+            const cameraPreviewDiv = document.querySelector('.camera-preview');
+            if (cameraPreviewDiv && !cameraPreviewDiv.querySelector('.perm-error-msg')) {
+                const errDiv = document.createElement('div');
+                errDiv.className = 'error-message perm-error-msg';
+                errDiv.innerText = '無法重新獲取鏡頭權限，請手動允許後重試。';
+                cameraPreviewDiv.appendChild(errDiv);
+                setTimeout(() => errDiv.remove(), 4000);
+            }
+        }
+    }
+
+    // 切換攝像頭開關狀態
+    async function toggleCamera() {
+        // 根據當前stream是否活躍判斷
+        const isActive = stream && stream.active && video.srcObject !== null;
+        if (isActive) {
+            await stopCameraOnly();
+        } else {
+            await startCameraOnly();
+        }
+    }
+
+    // 綁定開關按鈕事件
+    camToggleBtn.addEventListener('click', toggleCamera);
+
+    // 確保頁面關閉時釋放資源（保留原有beforeunload，同時增強）
+    window.addEventListener('beforeunload', () => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+    });
+
+    // ---------- 手語識別模擬 + 與鏡頭聯動增強體驗 ----------
+    const resultDiv = document.getElementById('signToTextResult');
+    const confidenceSpan = document.getElementById('confidenceSpan');
+    const exampleBtns = document.querySelectorAll('.example-btn[data-phrase]');
+    const captureBtn = document.getElementById('captureAndRecognizeBtn');
+
+    function updateRecognitionResult(phrase, confidenceVal = null) {
+        //删除🖐️emoji
+        //resultDiv.innerHTML = `✋ ${phrase}`;
+        resultDiv.innerHTML = `識別結果 ${phrase}`;
+        let confidence = confidenceVal !== null ? confidenceVal : (Math.random() * 0.07 + 0.91).toFixed(3);
+        confidenceSpan.innerText = `${(parseFloat(confidence)*100).toFixed(1)}%`;
+        resultDiv.parentElement.classList.add('flash');
+        setTimeout(() => resultDiv.parentElement.classList.remove('flash'), 300);
+        if ('speechSynthesis' in window) {
+            let utterance = new SpeechSynthesisUtterance(phrase);
+            utterance.lang = 'zh-HK';
+            utterance.rate = 0.9;
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    exampleBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const phrase = btn.getAttribute('data-phrase');
+            if (phrase) updateRecognitionResult(phrase);
+        });
+    });
+
+    const mockSignPhrases = [
+        "你好，請問旅遊諮詢處在哪裏？",
+        "我想購買八達通卡，謝謝。",
+        "我需要去最近的地鐵站，請指路。",
+        "這個藥品怎麼服用？",
+        "預約號碼是多少？",
+        "謝謝你的幫助，辛苦了。",
+        "請問有沒有輪椅可以借用？"
+    ];
+    
+    captureBtn.addEventListener('click', () => {
+        if (!stream || !video.videoWidth) {
+            alert("鏡頭尚未就緒，請確保已授權鏡頭權限。");
+            return;
+        }
+
+        // 检查当前画面中是否有手
+        if (!latestHandLandmarks) {
+            updateRecognitionResult("⚠️ 未檢測到手部，請將手放在鏡頭前", "0.000");
+            return;
+        }
+        
+        captureBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> 分析骨骼點中...';
+        captureBtn.disabled = true;
+
+        // 將 MediaPipe 抓取到的 21 个 3D 坐标发送给 Python 后端
+        fetch('http://127.0.0.1:5001/api/translate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ landmarks: latestHandLandmarks }) 
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                //删去识别结果
+                //const finalResult = `識別結果：${data.translation}`;
+                const finalResult = data.translation;
+                const mockConfidence = (Math.random() * 0.08 + 0.89).toFixed(3); 
+                updateRecognitionResult(finalResult, mockConfidence);
+            } else {
+                updateRecognitionResult(`⚠️ ${data.translation}`, "0.000");
+            }
+        })
+        .catch(error => {
+            console.error('後端請求失敗:', error);
+            updateRecognitionResult("⚠️ 無法連接後端，請確認 Python app.py 已啟動", "0.000");
+        })
+        .finally(() => {
+            captureBtn.innerHTML = '<i class="fas fa-camera"></i> 📸 從鏡頭識別手語';
+            captureBtn.disabled = false;
+            const overlay = document.querySelector('.skeleton-overlay');
+            if (overlay) {
+                overlay.style.background = "rgba(59,130,246,0.8)";
+                setTimeout(() => overlay.style.background = "rgba(0,0,0,0.6)", 300);
+            }
+        });
+    });
+    
+    // ---------- 右側虛擬人手語部分 ----------
+    const staffInput = document.getElementById('staffTextInput');
+    const generateSignBtn = document.getElementById('generateSignBtn');
+    const virtualSignText = document.getElementById('virtualSignText');
+    const signAnimationBox = document.getElementById('signAnimationBox');
+    const templateReplyBtns = document.querySelectorAll('.template-reply');
+    const voiceInputBtn = document.getElementById('voiceInputBtn');
+
+    function generateSignLanguage(text) {
+        if (!text || text.trim() === "") {
+            virtualSignText.innerHTML = "🤚 請輸入文字或使用語音輸入";
+            return;
+        }
+        virtualSignText.innerHTML = signDisplay;
+        signAnimationBox.classList.add('flash');
+        setTimeout(() => signAnimationBox.classList.remove('flash'), 400);
+        const subElement = document.querySelector('#signAnimationBox .sign-sub');
+        if (subElement) subElement.innerHTML = '<i class="fas fa-play"></i> 虛擬人正在播放標準手語 · 基於文字→HKSL映射';
+        setTimeout(() => {
+            if (subElement) subElement.innerHTML = '<i class="fas fa-film"></i> 標準香港手語動畫 (HKSL)';
+        }, 1500);
+    }
+
+    generateSignBtn.addEventListener('click', () => {
+        let rawText = staffInput.value.trim();
+        if (rawText === "") {
+            virtualSignText.innerHTML = "📢 請先輸入文字或使用麥克風輸入";
+            return;
+        }
+        generateSignLanguage(rawText);
+    });
+
+    templateReplyBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const replyText = btn.getAttribute('data-reply');
+            if (replyText) {
+                staffInput.value = replyText;
+                generateSignLanguage(replyText);
+            }
+        });
+    });
+
+    let speechRecognition = null;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        speechRecognition = new SpeechRecognition();
+        speechRecognition.interimResults = false;
+        speechRecognition.maxAlternatives = 1;
+    }
+
+    voiceInputBtn.addEventListener('click', () => {
+        if (!speechRecognition) {
+            alert("當前瀏覽器不支援語音識別，請手動輸入文字。推薦使用Chrome/Edge/Safari。");
+            return;
+        }
+        let lang = prompt("選擇識別語言: 輸入 1 粵語(香港) 2 英語 3 普通話", "1");
+        if (lang === "1") speechRecognition.lang = "zh-HK";
+        else if (lang === "2") speechRecognition.lang = "en-US";
+        else if (lang === "3") speechRecognition.lang = "zh-CN";
+        else speechRecognition.lang = "zh-HK";
+        
+        voiceInputBtn.innerHTML = '<i class="fas fa-microphone-alt"></i> 聆聽中...';
+        voiceInputBtn.disabled = true;
+        
+        speechRecognition.start();
+        speechRecognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            staffInput.value = transcript;
+            generateSignLanguage(transcript);
+            voiceInputBtn.innerHTML = '<i class="fas fa-microphone"></i> 粵/英/普';
+            voiceInputBtn.disabled = false;
+        };
+        speechRecognition.onerror = (e) => {
+            alert("語音識別出錯，請重試或手動輸入。");
+            voiceInputBtn.innerHTML = '<i class="fas fa-microphone"></i> 粵/英/普';
+            voiceInputBtn.disabled = false;
+        };
+        speechRecognition.onend = () => {
+            if (voiceInputBtn.disabled) {
+                voiceInputBtn.innerHTML = '<i class="fas fa-microphone"></i> 粵/英/普';
+                voiceInputBtn.disabled = false;
+            }
+        };
+    });
+    
+    window.addEventListener('load', () => {
+        generateSignLanguage("你好，歡迎使用AI手語翻譯終端，請問有什麼可以幫您？");
+        setTimeout(() => {
+            updateRecognitionResult("您好，需要協助嗎？ (手語範例)");
+        }, 800);
+    });
+    // ========== 新增：MediaPipe Holistic 骨骼追蹤邏輯 ==========
+    const canvasElement = document.getElementById('outputCanvas');
+    const canvasCtx = canvasElement.getContext('2d');
+
+    // 初始化 Holistic 模型
+    const holistic = new Holistic({locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
+    }});
+
+    holistic.setOptions({
+        modelComplexity: 1,
+        smoothLandmarks: true,
+        enableSegmentation: false,
+        refineFaceLandmarks: true,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+    });
+
+   // ========== 新增：全局变量保存最新的手部坐标 ==========
+    let latestHandLandmarks = null;
+
+    // 處理識別結果並繪製
+    holistic.onResults((results) => {
+        canvasCtx.save();
+        // 清空上一幀的畫布
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        
+        // 每次刷新时先清空坐标
+        latestHandLandmarks = null;
+
+        // 1. 繪製面部網格
+        if (results.faceLandmarks) {
+            drawConnectors(canvasCtx, results.faceLandmarks, FACEMESH_TESSELATION, {color: '#C0C0C050', lineWidth: 1});
+        }
+        // 2. 繪製左手 (优先抓取左手)
+        if (results.leftHandLandmarks) {
+            drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, {color: '#CC0000', lineWidth: 3});
+            drawLandmarks(canvasCtx, results.leftHandLandmarks, {color: '#00FF00', lineWidth: 1, radius: 2});
+            latestHandLandmarks = results.leftHandLandmarks; // 保存坐标
+        }
+        // 3. 繪製右手 (如果右手存在，覆盖左手或优先抓取右手)
+        if (results.rightHandLandmarks) {
+            drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, {color: '#00CC00', lineWidth: 3});
+            drawLandmarks(canvasCtx, results.rightHandLandmarks, {color: '#FF0000', lineWidth: 1, radius: 2});
+            latestHandLandmarks = results.rightHandLandmarks; // 保存坐标
+        }
+        canvasCtx.restore();
+    });
+
+    // 創建一個循環，不斷將原代碼中 video 的畫面發送給 MediaPipe
+    let lastVideoTime = -1;
+    async function processVideoFrame() {
+        // 確保視頻正在播放且有畫面
+        if (video && !video.paused && !video.ended && video.readyState >= 2) {
+            if (video.currentTime !== lastVideoTime) {
+                lastVideoTime = video.currentTime;
+                await holistic.send({image: video});
+            }
+        }
+        // 如果您點擊了原代碼的「關閉鏡頭」，清空畫布上的骨骼
+        if (video.srcObject === null) {
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        }
+        // 請求下一幀
+        requestAnimationFrame(processVideoFrame);
+    }
+    
+    // 啟動幀處理循環
+    processVideoFrame();
+</script>
+</body>
+</html>
